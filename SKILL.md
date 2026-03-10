@@ -1,13 +1,21 @@
 ---
 name: video-transcript
-description: "Convert a video/audio file into three deliverables in one run: (1) full transcript TXT, (2) summarized podcast script TXT, and (3) podcast MP3 audio at normal speed. Use when a user asks to turn a recording into readable notes plus a listenable recap, especially for interview, course, meeting, or long-form commentary videos."
+description: "Convert video/audio into transcript first, then have the current LLM directly read and understand the transcript to generate a podcast script, and finally synthesize podcast audio. Use when users want model-level understanding and summarization instead of programmatic summarization."
 ---
 
 # Video Transcript
 
 ## Overview
 
-Use LLM context to write the podcast script, then use the local script for transcription and audio synthesis.
+This skill is a two-stage workflow:
+1. Use local tools only for transcription and TTS.
+2. Use the current chat model (LLM context) to read transcript text, understand it, summarize it, and write the podcast script.
+
+Important constraints:
+- Do not call OpenAI (or any LLM) API from local Python scripts.
+- Do not rely on programmatic fallback summarization for final podcast script quality.
+- The podcast script must be generated in the current LLM conversation after reading transcript content.
+
 No OpenAI API key is required by this skill.
 
 ## Quick Start
@@ -25,7 +33,7 @@ python3 -m venv .venv
   --transcript-only
 ```
 
-3. In LLM context, read the transcript and write a high-quality podcast script to:
+3. In LLM context, read the transcript file content and generate a high-quality podcast script based on understanding and summarization. Then save it to:
 `<basename>_播客脚本.txt`
 
 4. Generate podcast audio from that script:
@@ -43,8 +51,15 @@ python3 -m venv .venv
 ## Workflow
 
 1. Transcribe with `openai-whisper` (model default: `base`).
-2. Generate podcast script via current LLM conversation/model context (not API call in script).
-3. Synthesize podcast audio using `edge-tts` with default `--rate +0%`.
+2. Read transcript text in the current conversation context.
+3. Generate podcast script via current LLM understanding/summarization (not API call in script).
+4. Save the generated script as `<basename>_播客脚本.txt`.
+5. Synthesize podcast audio using `edge-tts` with default `--rate +0%`.
+
+When transcript is very long:
+- Split transcript into chunks and summarize each chunk in-context.
+- Merge chunk summaries into one coherent podcast narrative.
+- Keep voice/style consistent and avoid losing key arguments.
 
 ## Options
 
@@ -62,4 +77,5 @@ python3 -m venv .venv
 
 - This skill intentionally does not alter playback speed unless `--rate` is explicitly provided.
 - For long videos, prefer `--model base` first, then upgrade model size only if quality is insufficient.
-- If no podcast script is passed in, the script uses a basic fallback summarizer (lower quality than LLM-generated script).
+- The local script now enforces explicit podcast script input. If `--podcast-script-file` / `--podcast-script-text` is missing, it exits with an error to prevent accidental low-quality generation.
+- Desired behavior: transcript understanding and podcast script writing happen in-chat, not via script-side model API calls.

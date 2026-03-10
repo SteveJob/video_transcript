@@ -1,4 +1,4 @@
 interface:
   display_name: "Video Transcript"
-  short_description: "Transcribe video and produce podcast assets"
-  default_prompt: "Convert a video to transcript, summarize into podcast script, and generate audio podcast output files."
+  short_description: "Transcribe first, then let the current LLM read transcript and write podcast script"
+  default_prompt: "Transcribe the video/audio into text, read the transcript in this chat context, generate a podcast script by model understanding/summarization (no script-side API call), then produce podcast audio from that script."

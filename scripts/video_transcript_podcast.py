@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import asyncio
-import os
-import re
 from pathlib import Path
 
 
@@ -13,31 +11,6 @@ def require_module(name):
         raise SystemExit(
             f"Missing dependency: {name}. Install with: .venv/bin/python -m pip install openai-whisper edge-tts\n{exc}"
         )
-
-
-def normalize_transcript(text):
-    text = text.replace("\r\n", "\n").replace("\r", "\n")
-    text = re.sub(r"\s+", " ", text)
-    text = re.sub(r"(.)\1{5,}", r"\1\1", text)
-    return text.strip()
-
-
-def build_podcast_script_fallback(title, transcript):
-    cleaned = normalize_transcript(transcript)
-    preview = cleaned[:1200]
-    return (
-        f"欢迎收听本期内容精读。今天我们围绕《{title}》做一次快速梳理，"
-        "目标是把原始文稿转成可直接吸收的行动版本。\n\n"
-        "先说核心结论：这期内容可以浓缩成三件事，第一是先明确问题边界，"
-        "第二是建立判断框架，第三是把观点转成可执行动作。\n\n"
-        "结合文稿，主要信息如下：\n"
-        f"{preview}\n\n"
-        "为了便于落地，你可以直接按这个顺序做：\n"
-        "第一，写下你当前最关键的问题和目标结果。\n"
-        "第二，用三条标准评估可行方案，并选出优先级最高的一条。\n"
-        "第三，把方案拆成今天能完成的第一步，并在当天复盘。\n\n"
-        "最后总结：理解内容只是开始，真正产生价值的是把观点变成连续动作。"
-    )
 
 
 def write_text(path, content):
@@ -126,8 +99,10 @@ def main():
             raise SystemExit(f"Podcast script file not found: {script_file}")
         podcast_script = script_file.read_text(encoding="utf-8").strip()
     else:
-        print("[WARN] No external podcast script provided, fallback summarizer used.")
-        podcast_script = build_podcast_script_fallback(stem, transcript)
+        raise SystemExit(
+            "Podcast script is required. Provide --podcast-script-file (recommended) "
+            "or --podcast-script-text. Generate script in current LLM chat context first."
+        )
 
     if not podcast_script:
         raise SystemExit("Podcast script is empty.")
