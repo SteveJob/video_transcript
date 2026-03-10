@@ -1,6 +1,6 @@
 ---
 name: video-transcript
-description: Convert a video/audio file into three deliverables in one run: (1) full transcript TXT, (2) summarized podcast script TXT, and (3) podcast MP3 audio at normal speed. Use when a user asks to turn a recording into readable notes plus a listenable recap, especially for interview, course, meeting, or long-form commentary videos.
+description: "Convert a video/audio file into three deliverables in one run: (1) full transcript TXT, (2) summarized podcast script TXT, and (3) podcast MP3 audio at normal speed. Use when a user asks to turn a recording into readable notes plus a listenable recap, especially for interview, course, meeting, or long-form commentary videos."
 ---
 
 # Video Transcript
