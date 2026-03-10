@@ -1,0 +1,4 @@
+interface:
+  display_name: "Video Transcript"
+  short_description: "Transcribe video and produce podcast assets"
+  default_prompt: "Convert a video to transcript, summarize into podcast script, and generate audio podcast output files."
